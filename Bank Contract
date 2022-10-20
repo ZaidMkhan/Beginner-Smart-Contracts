@@ -1,0 +1,71 @@
+pragma solidity ^0.8.6;
+
+contract Bank {
+
+    mapping(address => uint) balance;
+
+    address public owner;
+
+    modifier onlyOwner {
+        require(owner == msg.sender, "You are not the owner");
+        _;
+    }
+
+    constructor() {
+        owner = msg.sender;
+    }
+
+    event balanceAdded(uint amount, address depositedTo);
+    event transferred(address transferTo ,uint amount);
+
+    
+
+    
+
+    function deposit() public payable returns(uint) {
+        balance[msg.sender] += msg.value;
+        emit balanceAdded(msg.value, msg.sender);
+        return balance[msg.sender];
+    }
+
+
+
+    function withdraw(uint amount) public {
+
+        require(balance[msg.sender] >= amount, "u do not have this much money");
+
+        uint previousBalance = balance[msg.sender];
+
+        payable(msg.sender).transfer(amount);
+
+        assert(balance[msg.sender] == previousBalance - amount);
+    }
+
+
+
+
+
+    function totalBalance () public view returns(uint) {
+        return address(this).balance;
+    }
+
+    function getBalance() public view returns(uint) {
+        return balance[msg.sender];
+    }
+
+
+    function transfer(address recipient, uint amount) public {
+        require(balance[msg.sender] >= amount, "you do not have enough balance to send!!");
+        require(msg.sender != recipient, "you are the sender and receiver so both not possible");
+
+        uint previousSenderBalance = balance[msg.sender];
+
+        emit transferred(recipient, amount);
+
+        balance[msg.sender] -= amount;
+        balance[recipient] += amount;
+
+        assert(balance[msg.sender] == previousSenderBalance - amount);
+    }
+
+}
