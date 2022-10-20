@@ -16,18 +16,13 @@ contract Bank {
     }
 
     event balanceAdded(uint amount, address depositedTo);
-    event transferred(address transferTo ,uint amount);
-
-    
-
-    
+    event transferred(address transferTo ,uint amount); 
 
     function deposit() public payable returns(uint) {
         balance[msg.sender] += msg.value;
         emit balanceAdded(msg.value, msg.sender);
         return balance[msg.sender];
     }
-
 
 
     function withdraw(uint amount) public {
@@ -42,10 +37,7 @@ contract Bank {
     }
 
 
-
-
-
-    function totalBalance () public view returns(uint) {
+    function totalBalance () public view onlyowner returns(uint) {
         return address(this).balance;
     }
 
@@ -57,14 +49,10 @@ contract Bank {
     function transfer(address recipient, uint amount) public {
         require(balance[msg.sender] >= amount, "you do not have enough balance to send!!");
         require(msg.sender != recipient, "you are the sender and receiver so both not possible");
-
         uint previousSenderBalance = balance[msg.sender];
-
         emit transferred(recipient, amount);
-
         balance[msg.sender] -= amount;
         balance[recipient] += amount;
-
         assert(balance[msg.sender] == previousSenderBalance - amount);
     }
 
